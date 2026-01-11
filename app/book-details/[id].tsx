@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -34,6 +35,31 @@ export default function BookDetailsScreen() {
         loadBook();
     }, [id]);
 
+    const handleRead = async () => {
+        if (!book) return;
+
+        try {
+            const [savedReadBooks, savedPendingBooks] = await Promise.all([
+                AsyncStorage.getItem('readBooks'),
+                AsyncStorage.getItem('pendingBooks')
+            ]);
+
+            const readIds = savedReadBooks ? JSON.parse(savedReadBooks) : [];
+            let pendingIds = savedPendingBooks ? JSON.parse(savedPendingBooks) : [];
+
+            // Only add to pending if not already read and not already pending
+            if (!readIds.includes(book.id) && !pendingIds.includes(book.id)) {
+                pendingIds.push(book.id);
+                await AsyncStorage.setItem('pendingBooks', JSON.stringify(pendingIds));
+            }
+
+            router.push(`/read/${book.id}`);
+        } catch (error) {
+            console.error('Error updating pending books:', error);
+            router.push(`/read/${book.id}`);
+        }
+    };
+
     if (isLoading) {
         return (
             <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -57,12 +83,10 @@ export default function BookDetailsScreen() {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity style={styles.headerIcon} onPress={() => router.back()}>
-                    <Ionicons name="book-outline" size={24} color="#2D4A44" />
+                    <Ionicons name="chevron-back" size={24} color="#2D4A44" />
                 </TouchableOpacity>
                 <ThemedText style={styles.headerTitle}>Book Details</ThemedText>
-                <TouchableOpacity style={styles.headerIcon}>
-                    <Ionicons name="book-outline" size={24} color="#2D4A44" />
-                </TouchableOpacity>
+                <View style={{ width: 45 }} />
             </View>
 
             <View style={styles.content}>
@@ -83,18 +107,13 @@ export default function BookDetailsScreen() {
 
             {/* Bottom Action Bar */}
             <View style={styles.footer}>
-                <View style={styles.actionBar}>
-                    <TouchableOpacity style={styles.actionIconContainer}>
-                        <Ionicons name="book-outline" size={24} color="#2D4A44" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.readButton}
-                        activeOpacity={0.8}
-                        onPress={() => router.push(`/read/${book.id}`)}
-                    >
-                        <ThemedText style={styles.readButtonText}>Read This Book</ThemedText>
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                    style={styles.readButton}
+                    activeOpacity={0.8}
+                    onPress={handleRead}
+                >
+                    <ThemedText style={styles.readButtonText}>Read This Book</ThemedText>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -180,40 +199,23 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingBottom: 30,
     },
-    actionBar: {
-        flexDirection: 'row',
-        backgroundColor: '#81C784',
-        height: 80,
-        borderRadius: 40,
-        alignItems: 'center',
-        paddingHorizontal: 15,
-        borderWidth: 1.5,
-        borderColor: '#000',
-        gap: 15,
-    },
-    actionIconContainer: {
-        width: 55,
-        height: 55,
-        borderRadius: 27.5,
-        backgroundColor: '#FFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#000',
-    },
     readButton: {
-        flex: 1,
-        backgroundColor: '#FFF',
-        height: 55,
-        borderRadius: 27.5,
+        backgroundColor: '#81C784',
+        height: 70,
+        borderRadius: 35,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: '#000',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 5,
     },
     readButtonText: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#000',
     },
 });

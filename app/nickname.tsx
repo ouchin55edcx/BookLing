@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
@@ -23,14 +24,16 @@ export default function NicknameScreen() {
     const router = useRouter();
     const [nickname, setNickname] = useState('');
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (nickname.trim()) {
-            router.replace('/(tabs)');
+            try {
+                await AsyncStorage.setItem('nickname', nickname.trim());
+                router.replace('/(tabs)');
+            } catch (error) {
+                console.error('Error saving nickname:', error);
+                router.replace('/(tabs)');
+            }
         }
-    };
-
-    const handleSkip = () => {
-        router.replace('/(tabs)');
     };
 
     return (
@@ -42,9 +45,7 @@ export default function NicknameScreen() {
             <StatusBar style="dark" />
             <SafeAreaView style={styles.container}>
                 <View style={styles.header}>
-                    <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-                        <ThemedText style={styles.skipText}>Skip</ThemedText>
-                    </TouchableOpacity>
+                    {/* Skip button removed as nickname is required */}
                 </View>
 
                 <KeyboardAvoidingView
@@ -116,19 +117,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         paddingHorizontal: 20,
         paddingTop: 10,
-    },
-    skipButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        paddingHorizontal: 20,
-        paddingVertical: 8,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-    },
-    skipText: {
-        color: '#5C7C8A',
-        fontWeight: 'bold',
-        fontSize: 16,
     },
     content: {
         flex: 1,

@@ -20,8 +20,6 @@ export default function RootLayout() {
         <Stack.Screen name="nickname" options={{ headerShown: false }} />
         <Stack.Screen name="book-details/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="read/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="progress" options={{ headerShown: false }} />
-        <Stack.Screen name="saved" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

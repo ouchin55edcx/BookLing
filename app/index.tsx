@@ -1,18 +1,59 @@
 import { ThemedText } from '@/components/themed-text';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
 
-    const handleGetStarted = () => {
-        router.push('/nickname');
+    useEffect(() => {
+        checkFirstLaunch();
+    }, []);
+
+    const checkFirstLaunch = async () => {
+        try {
+            const hasLaunched = await AsyncStorage.getItem('hasLaunched');
+            const nickname = await AsyncStorage.getItem('nickname');
+
+            if (hasLaunched === 'true') {
+                if (nickname) {
+                    router.replace('/(tabs)');
+                } else {
+                    router.replace('/nickname');
+                }
+            } else {
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error('Error checking first launch:', error);
+            setIsLoading(false);
+        }
     };
+
+    const handleGetStarted = async () => {
+        try {
+            await AsyncStorage.setItem('hasLaunched', 'true');
+            router.push('/nickname');
+        } catch (error) {
+            console.error('Error saving launch status:', error);
+            router.push('/nickname');
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <View style={[styles.container, styles.loadingContainer]}>
+                <ActivityIndicator size="large" color="#7CB342" />
+            </View>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -69,6 +110,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#E0F7FA', // Light cyan background matching the design
+    },
+    loadingContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     header: {
         alignItems: 'center',

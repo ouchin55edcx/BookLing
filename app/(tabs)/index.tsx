@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import React, { useState } from 'react';
 import {
@@ -29,15 +30,26 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  const [nickname, setNickname] = useState('Explorer');
+  const [readBooks, setReadBooks] = useState<Book[]>([]);
+
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const [cats, bks] = await Promise.all([
+        const [cats, bks, savedNickname, savedReadIds] = await Promise.all([
           fetchCategories(),
-          fetchBooks()
+          fetchBooks(),
+          AsyncStorage.getItem('nickname'),
+          AsyncStorage.getItem('readBooks')
         ]);
+
         setCategories(cats);
         setBooks(bks);
+        if (savedNickname) setNickname(savedNickname);
+
+        const readIds = savedReadIds ? JSON.parse(savedReadIds) : [];
+        const finishedBooks = bks.filter(book => readIds.includes(book.id));
+        setReadBooks(finishedBooks);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -46,6 +58,14 @@ export default function HomeScreen() {
     };
     loadData();
   }, []);
+
+  const getUserLevel = () => {
+    const count = readBooks.length;
+    if (count === 0) return 'New Reader';
+    if (count < 3) return 'Rising Star';
+    if (count < 7) return 'Book Worm';
+    return 'Master Reader';
+  };
 
   const filteredBooks = books.filter(book => {
     const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
@@ -69,7 +89,7 @@ export default function HomeScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" color="#7CB342" />
       </SafeAreaView>
     );
   }
@@ -84,18 +104,20 @@ export default function HomeScreen() {
         >
           <View style={styles.avatarContainer}>
             <Image
-              source={{ uri: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix' }}
+              source={{ uri: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nickname}` }}
               style={styles.avatar}
             />
           </View>
           <View>
-            <ThemedText style={styles.username}>@ouchin55edcx</ThemedText>
-            <ThemedText style={styles.level}>Beginner Level</ThemedText>
+            <ThemedText style={styles.username}>@{nickname}</ThemedText>
+            <ThemedText style={styles.subtitle}>Welcome back!</ThemedText>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={() => router.push('/progress')}>
-          <Ionicons name="stats-chart-outline" size={24} color="#2D4A44" />
-        </TouchableOpacity>
+
+        <View style={styles.badgeContainer}>
+          <Ionicons name="ribbon" size={16} color="#FBC02D" />
+          <ThemedText style={styles.level}>{getUserLevel()}</ThemedText>
+        </View>
       </View>
 
       {/* Search Bar */}
@@ -144,6 +166,33 @@ export default function HomeScreen() {
         contentContainerStyle={styles.booksGrid}
         columnWrapperStyle={styles.booksRow}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          readBooks.length > 0 ? (
+            <View style={styles.finishedSection}>
+              <View style={styles.sectionHeader}>
+                <ThemedText style={styles.sectionTitle}>Finished Books</ThemedText>
+                <View style={styles.countBadge}>
+                  <ThemedText style={styles.countText}>{readBooks.length}</ThemedText>
+                </View>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.finishedScroll}>
+                {readBooks.map((book) => (
+                  <TouchableOpacity
+                    key={book.id}
+                    style={styles.finishedCard}
+                    onPress={() => router.push(`/book-details/${book.id}`)}
+                  >
+                    <Image source={book.image} style={styles.finishedImage} contentFit="cover" />
+                    <View style={styles.checkBadge}>
+                      <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+              <ThemedText style={styles.sectionTitle}>All Books</ThemedText>
+            </View>
+          ) : null
+        }
       />
 
       {/* Custom Bottom Navigation */}
@@ -154,9 +203,9 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navIconContainer}
-            onPress={() => router.push('/saved')}
+            onPress={() => router.push('/profile')}
           >
-            <Ionicons name="book-outline" size={24} color="#2D4A44" />
+            <Ionicons name="person-outline" size={24} color="#2D4A44" />
           </TouchableOpacity>
         </View>
       </View>
@@ -200,9 +249,79 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-  level: {
-    fontSize: 12,
+  subtitle: {
+    fontSize: 11,
     color: '#666',
+    marginTop: 2,
+  },
+  badgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#FFF9C4',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#FBC02D',
+  },
+  level: {
+    fontSize: 11,
+    color: '#F9A825',
+    fontWeight: 'bold',
+  },
+  finishedSection: {
+    marginBottom: 20,
+    paddingHorizontal: 5,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 10,
+  },
+  countBadge: {
+    backgroundColor: '#81C784',
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
+  countText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  finishedScroll: {
+    paddingBottom: 10,
+    gap: 15,
+  },
+  finishedCard: {
+    width: 100,
+    height: 140,
+    borderRadius: 15,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: '#000',
+    backgroundColor: '#FFF',
+  },
+  finishedImage: {
+    width: '100%',
+    height: '100%',
+  },
+  checkBadge: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 10,
   },
   iconButton: {
     width: 45,

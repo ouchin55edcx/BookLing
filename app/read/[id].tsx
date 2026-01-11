@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dimensions,
     ImageBackground,
@@ -20,23 +20,43 @@ import { ActivityIndicator } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 export default function ReadBookScreen() {
-    const { id } = useLocalSearchParams();
+    const { id, chapter } = useLocalSearchParams();
     const router = useRouter();
     const [book, setBook] = useState<Book | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
     const [isSombreMode, setIsSombreMode] = useState(false);
+    const [nickname, setNickname] = useState('Explorer');
 
-    React.useEffect(() => {
-        const loadBook = async () => {
+    useEffect(() => {
+        const loadData = async () => {
             if (typeof id === 'string') {
-                const data = await fetchBookById(id);
-                setBook(data || null);
+                const [bookData, savedNickname, savedProgress] = await Promise.all([
+                    fetchBookById(id),
+                    AsyncStorage.getItem('nickname'),
+                    AsyncStorage.getItem(`progress_${id}`)
+                ]);
+                setBook(bookData || null);
+                if (savedNickname) setNickname(savedNickname);
+
+                // If there's a chapter in the URL, use it. Otherwise use saved progress.
+                if (typeof chapter === 'string') {
+                    setCurrentChapterIndex(parseInt(chapter));
+                } else if (savedProgress) {
+                    setCurrentChapterIndex(parseInt(savedProgress));
+                }
             }
             setIsLoading(false);
         };
-        loadBook();
-    }, [id]);
+        loadData();
+    }, [id, chapter]);
+
+    // Save progress whenever chapter changes
+    useEffect(() => {
+        if (book && typeof id === 'string') {
+            AsyncStorage.setItem(`progress_${id}`, currentChapterIndex.toString());
+        }
+    }, [currentChapterIndex, id, book]);
 
     if (isLoading) {
         return (
@@ -56,10 +76,31 @@ export default function ReadBookScreen() {
 
     const currentChapter = book.chapters[currentChapterIndex];
 
-    const handleNextChapter = () => {
+    const handleNextChapter = async () => {
         if (currentChapterIndex < book.chapters.length - 1) {
             setCurrentChapterIndex(currentChapterIndex + 1);
         } else {
+            // Finish Reading
+            try {
+                const savedReadBooks = await AsyncStorage.getItem('readBooks');
+                const savedPendingBooks = await AsyncStorage.getItem('pendingBooks');
+
+                let readIds = savedReadBooks ? JSON.parse(savedReadBooks) : [];
+                let pendingIds = savedPendingBooks ? JSON.parse(savedPendingBooks) : [];
+
+                if (!readIds.includes(book.id)) {
+                    readIds.push(book.id);
+                }
+                pendingIds = pendingIds.filter((bid: string) => bid !== book.id);
+
+                await Promise.all([
+                    AsyncStorage.setItem('readBooks', JSON.stringify(readIds)),
+                    AsyncStorage.setItem('pendingBooks', JSON.stringify(pendingIds)),
+                    AsyncStorage.removeItem(`progress_${book.id}`) // Clear progress when finished
+                ]);
+            } catch (error) {
+                console.error('Error saving read status:', error);
+            }
             router.back();
         }
     };
@@ -79,40 +120,13 @@ export default function ReadBookScreen() {
             >
                 {isSombreMode && <View style={styles.darkOverlay} />}
                 <SafeAreaView style={styles.safeArea}>
-                    {/* Header */}
-                    <View style={[styles.header, isSombreMode && styles.headerSombre]}>
+                    {/* Close Button */}
+                    <View style={styles.closeButtonContainer}>
                         <TouchableOpacity
-                            style={styles.profileSection}
-                            onPress={() => router.push('/profile')}
+                            style={[styles.closeButton, isSombreMode && styles.closeButtonSombre]}
+                            onPress={() => router.push('/(tabs)')}
                         >
-                            <View style={styles.avatarContainer}>
-                                <Image
-                                    source={{ uri: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix' }}
-                                    style={styles.avatar}
-                                />
-                            </View>
-                            <View>
-                                <ThemedText
-                                    style={[styles.username, isSombreMode && styles.textSombre]}
-                                    lightColor={isSombreMode ? "#FFF" : "#000"}
-                                    darkColor={isSombreMode ? "#FFF" : "#000"}
-                                >
-                                    @ouchin55edcx
-                                </ThemedText>
-                                <ThemedText
-                                    style={[styles.level, isSombreMode && styles.textSombreDim]}
-                                    lightColor={isSombreMode ? "#AAA" : "#666"}
-                                    darkColor={isSombreMode ? "#AAA" : "#666"}
-                                >
-                                    Beginner Level
-                                </ThemedText>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.iconButton, isSombreMode && styles.buttonSombre]}
-                            onPress={() => router.back()}
-                        >
-                            <Ionicons name="book-outline" size={24} color={isSombreMode ? "#FFF" : "#2D4A44"} />
+                            <Ionicons name="close" size={28} color={isSombreMode ? "#FFF" : "#000"} />
                         </TouchableOpacity>
                     </View>
 
@@ -184,50 +198,26 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    closeButtonContainer: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        zIndex: 10,
     },
-    profileSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    avatarContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#C8E6C9',
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#A8D5BA',
-    },
-    avatar: {
-        width: '100%',
-        height: '100%',
-    },
-    username: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    level: {
-        fontSize: 12,
-        color: '#666',
-    },
-    iconButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: '#DDD',
+    closeButton: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFF',
+        borderWidth: 2,
+        borderColor: '#000',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5,
     },
     contentContainer: {
         flex: 1,
@@ -307,16 +297,12 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(0,0,0,0.6)',
     },
-    headerSombre: {
-        backgroundColor: 'rgba(0,0,0,0.8)',
-        borderBottomWidth: 1,
-        borderBottomColor: '#333',
+    closeButtonSombre: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        borderColor: '#555',
     },
     textSombre: {
         color: '#FFF',
-    },
-    textSombreDim: {
-        color: '#AAA',
     },
     buttonSombre: {
         backgroundColor: '#333',
