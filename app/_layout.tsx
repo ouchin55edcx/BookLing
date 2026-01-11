@@ -6,7 +6,8 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  // Ensure that reloading on `/modal` keeps a back button present.
+  initialRouteName: 'index',
 };
 
 export default function RootLayout() {
@@ -15,6 +16,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="nickname" options={{ headerShown: false }} />
+        <Stack.Screen name="book-details/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="read/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="progress" options={{ headerShown: false }} />
+        <Stack.Screen name="saved" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
