@@ -14,17 +14,37 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
-import { BOOKS } from '@/constants/books';
+import { Book, fetchBookById } from '@/lib/api';
+import { ActivityIndicator } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 export default function ReadBookScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
+    const [book, setBook] = useState<Book | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
     const [isSombreMode, setIsSombreMode] = useState(false);
 
-    const book = BOOKS.find(b => b.id === id);
+    React.useEffect(() => {
+        const loadBook = async () => {
+            if (typeof id === 'string') {
+                const data = await fetchBookById(id);
+                setBook(data || null);
+            }
+            setIsLoading(false);
+        };
+        loadBook();
+    }, [id]);
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#000" />
+            </SafeAreaView>
+        );
+    }
 
     if (!book || !book.chapters) {
         return (

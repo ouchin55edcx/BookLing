@@ -14,25 +14,46 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 
-import { BOOKS } from '@/constants/books';
 import { useRouter } from 'expo-router';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-const CATEGORIES = ['All', 'Animal Tales', 'Magic World', 'Space & Stars'];
+import { Book, fetchBooks, fetchCategories } from '@/lib/api';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [categories, setCategories] = useState<string[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredBooks = BOOKS.filter(book => {
+  React.useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [cats, bks] = await Promise.all([
+          fetchCategories(),
+          fetchBooks()
+        ]);
+        setCategories(cats);
+        setBooks(bks);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  const filteredBooks = books.filter(book => {
     const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
     const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const renderBook = ({ item }: { item: typeof BOOKS[0] }) => (
+  const renderBook = ({ item }: { item: Book }) => (
     <TouchableOpacity
       style={styles.bookCard}
       activeOpacity={0.9}
@@ -44,6 +65,14 @@ export default function HomeScreen() {
       </View>
     </TouchableOpacity>
   );
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#000" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,7 +115,7 @@ export default function HomeScreen() {
       {/* Categories */}
       <View style={styles.categoriesContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScroll}>
-          {CATEGORIES.map(category => (
+          {categories.map((category: string) => (
             <TouchableOpacity
               key={category}
               style={[

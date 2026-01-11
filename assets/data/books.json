@@ -1,0 +1,116 @@
+[
+    {
+        "id": "1",
+        "title": "Barnaby’s Big Balloon Trip",
+        "category": "Animal Adventures",
+        "image": "assets/books/barnabys-big-balloon-trip/cover.png",
+        "description": "Barnaby the hamster goes on an accidental journey high above the rooftops in a massive red balloon.",
+        "chapters": [
+            {
+                "id": "1",
+                "title": "Chapter 1: The Shiny Red String",
+                "content": "Barnaby the hamster lived in a cozy burrow under a garden fence, where life was predictable and smelled of fresh clover. One morning, he spotted something he had never seen before: a long, shiny red string trailing from the sky, snagged on a rogue splinter of the wooden fence. At the end of it was a massive, bobbing red balloon that danced in the breeze. Barnaby had never seen anything so bright. He felt a tug in his chest—not from the string, but from a sudden, strange spark of curiosity.",
+                "image": "assets/books/barnabys-big-balloon-trip/chapter1.png"
+            },
+            {
+                "id": "2",
+                "title": "Chapter 2: Up, Up, and Away!",
+                "content": "Barnaby climbed onto the fence and peered into the small wicker basket attached to the string. It was lined with soft silk and smelled like adventure. Just as he hopped inside to test the cushion, a strong summer breeze swept through the garden. With a tiny pop, the string untied from the fence. Barnaby felt his tummy do a somersault as the grass fell away. The garden fence, his burrow, and the sleeping cat all became smaller and smaller until they looked like toys.",
+                "image": "assets/books/barnabys-big-balloon-trip/chapter2.png"
+            },
+            {
+                "id": "3",
+                "title": "Chapter 3: Clouds Like Cotton Candy",
+                "content": "Soon, Barnaby was high above the rooftops, drifting where only the hawks dared to go. The clouds weren't gray and heavy as they looked from the ground; up close, they were pink and fluffy, catching the light of the morning sun like giant piles of cotton candy. He reached out a tiny, trembling paw and felt the cool, damp mist between his fur. He wasn't just a garden hamster anymore; he was a traveler of the sky.",
+                "image": "assets/books/barnabys-big-balloon-trip/chapter3.png"
+            },
+            {
+                "id": "4",
+                "title": "Chapter 4: The Chatty Sparrow",
+                "content": "\"Where are you heading, little fluff?\" chirped a sudden voice. A sparrow named Pip flew alongside the basket, his wings flapping in a steady rhythm. Barnaby, clutching the edge of the wicker, explained his accidental journey. Pip chirped happily and did a loop-de-loop. \"Don't worry! The wind is your friend today. Just lean left when the breeze blows west, and you'll find the Great Daisy Meadow. It’s the best landing spot for miles!\"",
+                "image": "assets/books/barnabys-big-balloon-trip/chapter4.png"
+            },
+            {
+                "id": "5",
+                "title": "Chapter 5: The Mountain Peak",
+                "content": "The air grew chilly as the balloon floated toward the Great Blue Mountains. Barnaby saw snow on the peaks that looked like a dusting of powdered sugar on a cake. The silence up here was beautiful and deep. As the basket brushed past a high pine tree growing from a cliff, Barnaby huddled deep into the silk lining. He was cold and far from home, but as he looked at the vast world below, he felt like the bravest explorer to ever live.",
+                "image": "assets/books/barnabys-big-balloon-trip/chapter5.png"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "title": "Luna’s Deep Sea Discovery",
+        "category": "Magic World",
+        "image": "assets/books/lunas-deep-sea-discovery/cover.png",
+        "description": "Luna the Sea-Glow jellyfish dives into the Midnight Zone to retrieve a lost treasure.",
+        "chapters": [
+            {
+                "id": "1",
+                "title": "Chapter 1: The Sunlit Reef",
+                "content": "Luna was a \"Sea-Glow,\" a tiny jellyfish with edges that shimmered like a rainbow. She lived in the Coral Gardens, where the water was always warm and the sunlight turned the sand into liquid gold. While the other jellyfish were content to bob near the surface, Luna spent her days staring down into the deep, blue shadows. She wondered what lived where the sunbeams couldn't reach, in the mysterious parts of the ocean people called \"The Midnight Zone.\"",
+                "image": "assets/books/lunas-deep-sea-discovery/chapter1.png"
+            },
+            {
+                "id": "2",
+                "title": "Chapter 2: The Lost Locket",
+                "content": "One afternoon, a fast current swept through the reef. It carried a silver locket—dropped by a passing boat—over the edge of the coral cliff and into the dark abyss. The locket belonged to Luna’s best friend, Barnaby the Crab. He was devastated; it was his favorite shiny treasure. \"I’ll get it back,\" Luna promised. Taking a deep breath of bubbly water, she pushed herself away from the warm reef and dived into the darkening blue.",
+                "image": "assets/books/lunas-deep-sea-discovery/chapter2.png"
+            },
+            {
+                "id": "3",
+                "title": "Chapter 3: The Forest of Kelp",
+                "content": "As Luna sank deeper, the water grew colder and the bright colors of the reef faded. She found herself drifting through a forest of giant kelp. The stalks were as tall as skyscrapers, swaying slowly in the deep currents. Shadows danced between the leaves, making Luna’s heart race. Suddenly, an ancient sea turtle named Titan drifted out from the leaves. \"You’re far from home, little spark,\" he rumbled. Instead of being scary, Titan offered to guide her through the \"Silent Woods\" of the deep.",
+                "image": "assets/books/lunas-deep-sea-discovery/chapter3.png"
+            },
+            {
+                "id": "4",
+                "title": "Chapter 4: Finding Her Own Light",
+                "content": "The deeper they went, the darker it became until the sun vanished completely. Luna felt a moment of true fear—until she looked at her own tentacles. In the absolute darkness, her body was glowing brighter than a star! All around her, the deep sea began to wake up. Tiny shrimp sparked like fireflies, and glowing squid left trails of neon blue in the water. Luna realized she wasn't lost in the dark; she was simply part of a different kind of light.",
+                "image": "assets/books/lunas-deep-sea-discovery/chapter4.png"
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "title": "The Squirrel Who Forgot Everything",
+        "category": "Animal Adventures",
+        "image": "assets/books/the-squirrel-who-forgot-everything/cover.png",
+        "description": "Sammy the Squirrel forgets where he buried his acorns and learns that the forest always takes care of its friends.",
+        "chapters": [
+            {
+                "id": "1",
+                "title": "Chapter 1: The Great Acorn Amnesia",
+                "content": "Sammy the Squirrel had a very important job. Every autumn, he spent his days collecting the finest, crunchiest acorns in the forest to prepare for the long winter sleep. But Sammy had a tiny problem: his brain was as fuzzy as his tail. One frosty morning, he woke up, twitched his nose, and looked out at the forest floor. He knew he had buried exactly forty-two acorns yesterday, but for the life of him, he couldn't remember where a single one was hidden. \"Was it under the mossy rock?\" he squeaked. \"Or was it inside the hollow log near the stream?\" He realized with a gulp that he had forgotten everything.",
+                "image": "assets/books/the-squirrel-who-forgot-everything/chapter1.png"
+            },
+            {
+                "id": "2",
+                "title": "Chapter 2: The Map of Many Holes",
+                "content": "Sammy decided that if he couldn't remember, he would just have to dig. He started at the base of the Old Oak and began making small holes in the dirt. Before long, the forest floor looked like a giant piece of Swiss cheese! Instead of acorns, he found a lost button, a very confused beetle named Barnaby, and an old bottle cap. Just as he was about to give up, a blue jay named Jinx landed on a nearby branch. \"You're looking with your paws, Sammy,\" Jinx teased, \"but you should be looking with your heart... and maybe a little bit of help from your friends.\"",
+                "image": "assets/books/the-squirrel-who-forgot-everything/chapter2.png"
+            },
+            {
+                "id": "3",
+                "title": "Chapter 3: The Secret in the Hollow",
+                "content": "Jinx offered to help Sammy from the sky. \"From up here, I can see the patterns in the grass where you walked yesterday!\" Jinx chirped. Following the bird's guidance, Sammy climbed high into a secret hollow of a willow tree—a place he never usually went. Inside, he didn't find his acorns, but he found something even better: a stash of dried berries and sunflower seeds left behind by an old friend who had moved away. Sammy realized that even when you forget your own plans, the forest has a way of taking care of you if you're brave enough to keep exploring.",
+                "image": "assets/books/the-squirrel-who-forgot-everything/chapter3.png"
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "title": "The Fantastic Robot Invention Fair!",
+        "category": "Space & Stars",
+        "image": "assets/books/barnabys-big-balloon-trip/cover.png",
+        "description": "Discover the most amazing robots ever built in this high-tech adventure!",
+        "chapters": [
+            {
+                "id": "1",
+                "title": "Chapter 1: The Metal Workshop",
+                "content": "In the heart of the city, a young inventor named Leo was busy polishing his latest creation: a small, silver robot with glowing blue eyes. The workshop was filled with the sound of whirring gears and the smell of ozone.",
+                "image": "assets/books/barnabys-big-balloon-trip/chapter1.png"
+            }
+        ]
+    }
+]

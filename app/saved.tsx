@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     FlatList,
     StyleSheet,
@@ -13,17 +14,31 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
-import { BOOKS } from '@/constants/books';
+import { Book, fetchBooks } from '@/lib/api';
 
 const { width } = Dimensions.get('window');
 
-// For demonstration, let's say the first 3 books are saved
-const SAVED_BOOKS = BOOKS.slice(0, 3);
-
 export default function SavedBooksScreen() {
     const router = useRouter();
+    const [savedBooks, setSavedBooks] = React.useState<Book[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
 
-    const renderBook = ({ item }: { item: typeof BOOKS[0] }) => (
+    React.useEffect(() => {
+        const loadSavedBooks = async () => {
+            try {
+                const books = await fetchBooks();
+                // For demonstration, let's say the first 3 books are saved
+                setSavedBooks(books.slice(0, 3));
+            } catch (error) {
+                console.error('Error loading saved books:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadSavedBooks();
+    }, []);
+
+    const renderBook = ({ item }: { item: Book }) => (
         <TouchableOpacity
             style={styles.bookCard}
             activeOpacity={0.9}
@@ -41,6 +56,14 @@ export default function SavedBooksScreen() {
             </View>
         </TouchableOpacity>
     );
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#000" />
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -72,13 +95,13 @@ export default function SavedBooksScreen() {
                 <View style={styles.titleRow}>
                     <ThemedText style={styles.title}>Saved Books</ThemedText>
                     <View style={styles.countBadge}>
-                        <ThemedText style={styles.countText}>{SAVED_BOOKS.length}</ThemedText>
+                        <ThemedText style={styles.countText}>{savedBooks.length}</ThemedText>
                     </View>
                 </View>
 
-                {SAVED_BOOKS.length > 0 ? (
+                {savedBooks.length > 0 ? (
                     <FlatList
-                        data={SAVED_BOOKS}
+                        data={savedBooks}
                         renderItem={renderBook}
                         keyExtractor={item => item.id}
                         showsVerticalScrollIndicator={false}
